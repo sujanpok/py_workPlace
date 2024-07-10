@@ -16,15 +16,19 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    docker.build('flask-app')
+                    withEnv(['PATH+DOCKER=/usr/local/bin']) {
+                        docker.build('flask-app')
+                    }
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    docker.image('flask-app').inside {
-                        sh 'pytest'
+                    withEnv(['PATH+DOCKER=/usr/local/bin']) {
+                        docker.image('flask-app').inside {
+                            sh 'pytest'
+                        }
                     }
                 }
             }
@@ -32,7 +36,9 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    docker.image('flask-app').run('-p 3030:3030')
+                    withEnv(['PATH+DOCKER=/usr/local/bin']) {
+                        docker.image('flask-app').run('-p 3030:3030')
+                    }
                 }
             }
         }
