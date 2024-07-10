@@ -4,7 +4,13 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/sujanpok/py_workPlace.git'
+                script {
+                    try {
+                        git branch: 'main', url: 'https://github.com/sujanpok/py_workPlace.git'
+                    } catch (Exception e) {
+                        error "Failed to checkout repository: ${e.message}"
+                    }
+                }
             }
         }
         stage('Build') {
@@ -33,7 +39,13 @@ pipeline {
     }
     post {
         always {
-            junit 'tests/reports/*.xml'
+            script {
+                try {
+                    junit 'tests/reports/*.xml'
+                } catch (Exception e) {
+                    echo "No test report files were found: ${e.message}"
+                }
+            }
         }
     }
 }
